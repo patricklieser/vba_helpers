@@ -1,3 +1,4 @@
+Attribute VB_Name = "clean_worksheet"
 Option Explicit
 
 Public Function DoesItemExist(mySet As Collection, myCheck As String) As Boolean
@@ -50,10 +51,37 @@ Sub clean(level As Integer, symbols As Variant, direction As String, Optional sh
             If Not DoesItemExist(s, Columns.Columns(i).Cells(level).Value) Then Columns.Columns(i).EntireColumn.Delete
         Next i
     End If
-    
-    
 End Sub
 
+
+Sub valuecopy(ws As Worksheet)
+    Dim ws_name As String
+    ws_name = ws.Name
+    
+    Dim ws_new, ws_after As Worksheet
+    Dim ws_after_name As String
+    Set ws_after = ws.Parent.Worksheets(ws.Parent.Worksheets.Count)
+    ws.Copy after:=ws_after
+    Set ws_new = Sheets(ws_after.Index + 1)
+    ws_new.Name = ws.Name & "_copy"
+    
+    ws_new.Cells.Copy
+    ws_new.Cells(1, 1).Cells.PasteSpecial xlPasteValues
+    Application.CutCopyMode = False
+    ws_new.Cells(1, 1).Select
+End Sub
+
+
+Sub ws_move(ws As Worksheet)
+    ws.Move
+    Debug.Print ActiveSheet.Name
+    ActiveWorkbook.SaveAs FileName:=ActiveSheet.Name & ".xlsx"
+End Sub
+
+
+Sub test()
+    Call ws_move(Worksheets("Blatt1"))
+End Sub
 
 Sub main()
     Dim keepcoll As Collection
@@ -62,5 +90,4 @@ Sub main()
     keepcoll.Add ("a")
     Call clean(1, keepcoll, "columns")
 End Sub
-
 
